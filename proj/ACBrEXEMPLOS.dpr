@@ -15,7 +15,8 @@ uses
   Vcl.Forms,
   Vcl.Themes,
   Vcl.Styles,
-  ACBr.Exemplos.View in '..\src\view\ACBr.Exemplos.View.pas' {ViewMainACBr};
+  ACBr.Exemplos.View in '..\src\view\ACBr.Exemplos.View.pas' {ViewMainACBr},
+  Dao.ACBR.Boleto in '..\src\dao\Dao.ACBR.Boleto.pas' {dmACBRBoleto: TDataModule};
 
 {$R *.res}
 
@@ -24,5 +25,6 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.Title := 'TSplitView Demo';
   Application.CreateForm(TViewMainACBr, ViewMainACBr);
+  Application.CreateForm(TdmACBRBoleto, dmACBRBoleto);
   Application.Run;
 end.

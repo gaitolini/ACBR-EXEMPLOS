@@ -33,44 +33,54 @@ uses
   Vcl.ImgList,
   Vcl.Imaging.PngImage,
   Vcl.ComCtrls,
-  Vcl.ActnList;
+  Vcl.ActnList, Vcl.WinXPanels, Vcl.Imaging.jpeg;
 
 type
   TViewMainACBr = class(TForm)
     pnlToolbar: TPanel;
-    grpDisplayMode: TRadioGroup;
-    grpPlacement: TRadioGroup;
-    pnlSettings: TPanel;
-    grpCloseStyle: TRadioGroup;
-    chkUseAnimation: TCheckBox;
-    SV: TSplitView;
+    svMain: TSplitView;
     catMenuItems: TCategoryButtons;
-    lstLog: TListBox;
     imlIcons: TImageList;
     imgMenu: TImage;
-    cbxVclStyles: TComboBox;
-    grpAnimation: TGroupBox;
-    lblLog: TLabel;
-    lblAnimationDelay: TLabel;
-    lblAnimationStep: TLabel;
-    trkAnimationDelay: TTrackBar;
-    trkAnimationStep: TTrackBar;
     ActionList1: TActionList;
     actHome: TAction;
     actLayout: TAction;
     actPower: TAction;
-    chkCloseOnMenuClick: TCheckBox;
     lblTitle: TLabel;
-    lblVclStyle: TLabel;
     Image1: TImage;
+    cpMain: TCardPanel;
+    cardLayoutOption: TCard;
+    pnlSettings: TPanel;
+    lblLog: TLabel;
+    lblVclStyle: TLabel;
+    grpDisplayMode: TRadioGroup;
+    grpPlacement: TRadioGroup;
+    grpCloseStyle: TRadioGroup;
+    lstLog: TListBox;
+    grpAnimation: TGroupBox;
+    lblAnimationDelay: TLabel;
+    lblAnimationStep: TLabel;
+    chkUseAnimation: TCheckBox;
+    trkAnimationDelay: TTrackBar;
+    trkAnimationStep: TTrackBar;
+    chkCloseOnMenuClick: TCheckBox;
+    cbxVclStyles: TComboBox;
+    cardHome: TCard;
+    cardPowerSettings: TCard;
+    cardBoletos: TCard;
+    Image2: TImage;
+    actBoleto: TAction;
+    actPIX: TAction;
+    cardPix: TCard;
+    Image3: TImage;
     procedure FormCreate(Sender: TObject);
     procedure grpDisplayModeClick(Sender: TObject);
     procedure grpPlacementClick(Sender: TObject);
     procedure grpCloseStyleClick(Sender: TObject);
-    procedure SVClosed(Sender: TObject);
-    procedure SVClosing(Sender: TObject);
-    procedure SVOpened(Sender: TObject);
-    procedure SVOpening(Sender: TObject);
+    procedure svMainClosed(Sender: TObject);
+    procedure svMainClosing(Sender: TObject);
+    procedure svMainOpened(Sender: TObject);
+    procedure svMainOpening(Sender: TObject);
     procedure catMenuItemsCategoryCollapase(Sender: TObject; const Category: TButtonCategory);
     procedure imgMenuClick(Sender: TObject);
     procedure chkUseAnimationClick(Sender: TObject);
@@ -80,6 +90,8 @@ type
     procedure actLayoutExecute(Sender: TObject);
     procedure actPowerExecute(Sender: TObject);
     procedure cbxVclStylesChange(Sender: TObject);
+    procedure actBoletoExecute(Sender: TObject);
+    procedure actPIXExecute(Sender: TObject);
   private
     procedure Log(const Msg: string);
   public
@@ -103,6 +115,9 @@ begin
     cbxVclStyles.Items.Add(StyleName);
 
   cbxVclStyles.ItemIndex := cbxVclStyles.Items.IndexOf(TStyleManager.ActiveStyle.Name);
+
+  cpMain.ActiveCard := cardHome;
+  svMain.Open;
 end;
 
 procedure TViewMainACBr.cbxVclStylesChange(Sender: TObject);
@@ -112,94 +127,115 @@ end;
 
 procedure TViewMainACBr.imgMenuClick(Sender: TObject);
 begin
-  if SV.Opened then
-    SV.Close
-  else
-    SV.Open;
+  svMain.Opened := not svMain.Opened;
 end;
 
 procedure TViewMainACBr.grpDisplayModeClick(Sender: TObject);
 begin
-  SV.DisplayMode := TSplitViewDisplayMode(grpDisplayMode.ItemIndex);
+  svMain.DisplayMode := TSplitViewDisplayMode(grpDisplayMode.ItemIndex);
 end;
 
 procedure TViewMainACBr.grpCloseStyleClick(Sender: TObject);
 begin
-  SV.CloseStyle := TSplitViewCloseStyle(grpCloseStyle.ItemIndex);
+  svMain.CloseStyle := TSplitViewCloseStyle(grpCloseStyle.ItemIndex);
 end;
 
 procedure TViewMainACBr.grpPlacementClick(Sender: TObject);
 begin
-  SV.Placement := TSplitViewPlacement(grpPlacement.ItemIndex);
+  svMain.Placement := TSplitViewPlacement(grpPlacement.ItemIndex);
 end;
 
-procedure TViewMainACBr.SVClosed(Sender: TObject);
+procedure TViewMainACBr.svMainClosed(Sender: TObject);
 begin
   // When TSplitView is closed, adjust ButtonOptions and Width
   catMenuItems.ButtonOptions := catMenuItems.ButtonOptions - [boShowCaptions];
-  if SV.CloseStyle = svcCompact then
-    catMenuItems.Width := SV.CompactWidth;
+  if svMain.CloseStyle = svcCompact then
+    catMenuItems.Width := svMain.CompactWidth;
 end;
 
-procedure TViewMainACBr.SVClosing(Sender: TObject);
+procedure TViewMainACBr.svMainClosing(Sender: TObject);
 begin
 //
 end;
 
-procedure TViewMainACBr.SVOpened(Sender: TObject);
+procedure TViewMainACBr.svMainOpened(Sender: TObject);
 begin
   // When not animating, change size of catMenuItems when TSplitView is opened
   catMenuItems.ButtonOptions := catMenuItems.ButtonOptions + [boShowCaptions];
-  catMenuItems.Width := SV.OpenedWidth;
+  catMenuItems.Width := svMain.OpenedWidth;
 end;
 
-procedure TViewMainACBr.SVOpening(Sender: TObject);
+procedure TViewMainACBr.svMainOpening(Sender: TObject);
 begin
   // When animating, change size of catMenuItems at the beginning of open
   catMenuItems.ButtonOptions := catMenuItems.ButtonOptions + [boShowCaptions];
-  catMenuItems.Width := SV.OpenedWidth;
+  catMenuItems.Width := svMain.OpenedWidth;
 end;
 
 procedure TViewMainACBr.chkUseAnimationClick(Sender: TObject);
 begin
-  SV.UseAnimation := chkUseAnimation.Checked;
-  lblAnimationDelay.Enabled := SV.UseAnimation;
-  trkAnimationDelay.Enabled := SV.UseAnimation;
-  lblAnimationStep.Enabled := SV.UseAnimation;
-  trkAnimationStep.Enabled := SV.UseAnimation;
+  svMain.UseAnimation := chkUseAnimation.Checked;
+  lblAnimationDelay.Enabled := svMain.UseAnimation;
+  trkAnimationDelay.Enabled := svMain.UseAnimation;
+  lblAnimationStep.Enabled := svMain.UseAnimation;
+  trkAnimationStep.Enabled := svMain.UseAnimation;
 end;
 
 procedure TViewMainACBr.trkAnimationDelayChange(Sender: TObject);
 begin
-  SV.AnimationDelay := trkAnimationDelay.Position * 5;
-  lblAnimationDelay.Caption := 'Animation Delay (' + IntToStr(SV.AnimationDelay) + ')';
+  svMain.AnimationDelay := trkAnimationDelay.Position * 5;
+  lblAnimationDelay.Caption := 'Animation Delay (' + IntToStr(svMain.AnimationDelay) + ')';
 end;
 
 procedure TViewMainACBr.trkAnimationStepChange(Sender: TObject);
 begin
-  SV.AnimationStep := trkAnimationStep.Position * 5;
-  lblAnimationStep.Caption := 'Animation Step (' + IntToStr(SV.AnimationStep) + ')';
+  svMain.AnimationStep := trkAnimationStep.Position * 5;
+  lblAnimationStep.Caption := 'Animation Step (' + IntToStr(svMain.AnimationStep) + ')';
+end;
+
+procedure TViewMainACBr.actBoletoExecute(Sender: TObject);
+begin
+  Log(actBoleto.Caption + ' Clicked');
+  if svMain.Opened and chkCloseOnMenuClick.Checked then
+    svMain.Close;
+
+  cpMain.ActiveCard := cardBoletos;
 end;
 
 procedure TViewMainACBr.actHomeExecute(Sender: TObject);
 begin
   Log(actHome.Caption + ' Clicked');
-  if SV.Opened and chkCloseOnMenuClick.Checked then
-    SV.Close;
+  if svMain.Opened and chkCloseOnMenuClick.Checked then
+    svMain.Close;
+
+  cpMain.ActiveCard := cardHome;
 end;
 
 procedure TViewMainACBr.actLayoutExecute(Sender: TObject);
 begin
   Log(actLayout.Caption + ' Clicked');
-  if SV.Opened and chkCloseOnMenuClick.Checked then
-    SV.Close;
+  if svMain.Opened and chkCloseOnMenuClick.Checked then
+    svMain.Close;
+
+  cpMain.ActiveCard := cardLayoutOption;
+end;
+
+procedure TViewMainACBr.actPIXExecute(Sender: TObject);
+begin
+  Log(actPIX.Caption + ' Clicked');
+  if svMain.Opened and chkCloseOnMenuClick.Checked then
+    svMain.Close;
+
+  cpMain.ActiveCard := cardPix;
 end;
 
 procedure TViewMainACBr.actPowerExecute(Sender: TObject);
 begin
   Log(actPower.Caption + ' Clicked');
-  if SV.Opened and chkCloseOnMenuClick.Checked then
-    SV.Close;
+  if svMain.Opened and chkCloseOnMenuClick.Checked then
+    svMain.Close;
+
+  cpMain.ActiveCard := cardPowerSettings;
 end;
 
 procedure TViewMainACBr.catMenuItemsCategoryCollapase(Sender: TObject; const Category: TButtonCategory);
