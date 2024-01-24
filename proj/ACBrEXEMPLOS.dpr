@@ -15,7 +15,7 @@ uses
   Vcl.Forms,
   Vcl.Themes,
   Vcl.Styles,
-  ACBr.Exemplos.View in '..\Src\ACBr.Exemplos.View.pas' {ViewMainACBr};
+  ACBr.Exemplos.View in '..\src\view\ACBr.Exemplos.View.pas' {ViewMainACBr};
 
 {$R *.res}
 

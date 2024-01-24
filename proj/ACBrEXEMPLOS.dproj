@@ -94,7 +94,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\Src\ACBr.Exemplos.View.pas">
+        <DCCReference Include="..\src\view\ACBr.Exemplos.View.pas">
             <Form>ViewMainACBr</Form>
             <FormType>dfm</FormType>
         </DCCReference>
